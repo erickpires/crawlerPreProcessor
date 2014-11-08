@@ -1,21 +1,67 @@
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Calendar;
+import java.util.Locale;
 
 import twitter4j.StallWarning;
 import twitter4j.Status;
 import twitter4j.StatusDeletionNotice;
 import twitter4j.StatusListener;
 
+import static java.util.Calendar.*;
+
 public class MonitoraStatus implements StatusListener {
 
-	@Override
+    private FileWriter outputFileWriter;
+    private long timeToStop;
+
+	public MonitoraStatus(){
+        super();
+
+        Calendar now = getInstance();
+
+        String dirName = now.get(DAY_OF_MONTH) + "-" + now.get(MONTH) + "_" + now.get(HOUR_OF_DAY) + "-" + now.get(MINUTE) + "-" + now.get(SECOND);
+        String fileName = "[" + Integer.toHexString(now.hashCode()) + "] tweets.txt";
+
+        now.add(HOUR_OF_DAY, 1);
+        timeToStop = now.getTimeInMillis();
+
+        File dir = new File(dirName);
+        if(!dir.exists())
+            dir.mkdirs();
+
+        File file = new File(dir, fileName);
+
+        try {
+            outputFileWriter = new FileWriter(file);
+        } catch (IOException ignored) {
+        }
+    }
+
+    @Override
     public synchronized void onStatus(Status status) {
 
         String tweet = status.getText();
 
-        String filtered = PreProcessor.filter(tweet, false, true);
+        try {
+            //if(!tweet.contains("RT")) {
+                outputFileWriter.write(">>>>>>>>>>>TWEET<<<<<<<<<<<\n" + tweet + "\n");
+                outputFileWriter.flush();
+            //}
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-        System.out.println(">>>>>>>>>>>>>>>>>>>TWEET<<<<<<<<<<<<<<<<<\n" + tweet +
-                       "\n\n>>>>>>>>>>>>>>>>>>FILTERED<<<<<<<<<<<<<<<\n" + filtered + "\n\n\n");
+        if(System.currentTimeMillis() >= timeToStop){
+            try {
+                outputFileWriter.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            System.exit(0);
+        }
     }
 		
 

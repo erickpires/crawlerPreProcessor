@@ -3,8 +3,7 @@ import twitter4j.TwitterStream;
 import twitter4j.TwitterStreamFactory;
 import twitter4j.auth.AccessToken;
 
-
-public class Monitoramento {
+public final class Monitoramento {
 
     private static final double lat = -22.9; //latitude Rio de Janeiro
     private static final double lon = -43.2; //longitude Rio de Janeiro
@@ -22,19 +21,16 @@ public class Monitoramento {
 		inicia();
 	}
 	
-	public TwitterStream logar(){
-		final String CONSUMER_KEY = "1j5uZ0ywn3VwAaFb7QBEjA";
-		final String CONSUMER_SECRET = "XUISgSfHJwMtfegBbcGcH1aj7uqPOXJGCtn3zF4FAsA";
-		String token = "1852160593-N7kfpMPrWUoTGzHAFC2gCc5EVPYeyBd2IbDNidO";
-	    String tokenSecret = "vOLYi3mLEE4qoOhB71mTzcteQtI4W5bodlIhCXUPaU";
-	    AccessToken accessToken = new AccessToken(token, tokenSecret);
+	private static TwitterStream logar(){
+
+	    AccessToken accessToken = new AccessToken(Constante.TOKEN, Constante.TOKEN_SECRET);
 	    TwitterStream twitterStream = new TwitterStreamFactory().getInstance();
-        twitterStream.setOAuthConsumer(CONSUMER_KEY, CONSUMER_SECRET);
+        twitterStream.setOAuthConsumer(Constante.CONSUMER_KEY, Constante.CONSUMER_SECRET);
 	    twitterStream.setOAuthAccessToken(accessToken);
 	    return twitterStream;
 	}
 	
-	public void filtro(String[] keywordsArray, TwitterStream twitterStream){
+	private static void filtro(String[] keywordsArray, TwitterStream twitterStream){
         FilterQuery filterQuery = new FilterQuery();
 
         filterQuery.track(keywordsArray);
@@ -44,8 +40,8 @@ public class Monitoramento {
         twitterStream.filter(filterQuery);
 	}
 	
-	public void inicia(){
-		String[] keywordsArray = { "enem","caneta"};
+	private static void inicia(){
+		String[] keywordsArray = { "enem"};
 		TwitterStream twitterStream = logar();
 		twitterStream.addListener(new MonitoraStatus());
 		filtro(keywordsArray, twitterStream);

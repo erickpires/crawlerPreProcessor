@@ -20,7 +20,7 @@ public class MonitoraStatus implements StatusListener {
 	public MonitoraStatus(){
         super();
 
-        Calendar now = getInstance();
+        /*Calendar now = getInstance();
 
         String dirName = now.get(DAY_OF_MONTH) + "-" + now.get(MONTH) + "_" + now.get(HOUR_OF_DAY) + "-" + now.get(MINUTE) + "-" + now.get(SECOND);
         String fileName = "[" + Integer.toHexString(now.hashCode()) + "] tweets.txt";
@@ -37,7 +37,7 @@ public class MonitoraStatus implements StatusListener {
         try {
             outputFileWriter = new FileWriter(file);
         } catch (IOException ignored) {
-        }
+        }*/
     }
 
     @Override
@@ -45,7 +45,9 @@ public class MonitoraStatus implements StatusListener {
 
         String tweet = status.getText();
 
-        try {
+        System.out.println(tweet);
+
+        /*try {
             //if(!tweet.contains("RT")) {
                 outputFileWriter.write(">>>>>>>>>>>TWEET<<<<<<<<<<<\n" + tweet + "\n");
                 outputFileWriter.flush();
@@ -61,7 +63,7 @@ public class MonitoraStatus implements StatusListener {
                 e.printStackTrace();
             }
             System.exit(0);
-        }
+        }*/
     }
 		
 

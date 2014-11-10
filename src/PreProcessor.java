@@ -1,3 +1,5 @@
+import com.sun.javafx.beans.annotations.NonNull;
+
 import java.io.*;
 
 /**
@@ -14,7 +16,7 @@ public class PreProcessor {
     public static final String stopWord = "(?<![a-z" +specialChars + "])(" + stopWords + ")(?![a-z" + specialChars + "])";
     public static final String BLANK_STRING = "";
 
-    public static String filter(String str, boolean shouldRemoveStopWord, boolean shouldIgnoreRetweet) {
+    public static String filter(@NonNull String str, boolean shouldRemoveStopWord, boolean shouldIgnoreRetweet) {
         String result;
 
         if (str.contains(retweet))
@@ -34,7 +36,9 @@ public class PreProcessor {
         result = result.replaceAll(lastWordIncomplete, BLANK_STRING);
 
         result = result.replaceAll("[^\\p{L1}]", BLANK_STRING);  //Remove all characters that are not Latin-1
-        result = result.replaceAll("\\p{P}", BLANK_STRING);  //Remove punctuation marks
+        result = result.replaceAll("\\p{P}", " ");  //Remove punctuation marks
+        result = result.replaceAll("(\\n)+", " ");
+        result = result.replaceAll("(\\t)+", " ");
 
         result = result.replaceAll("[ ]*[ ]", " ");  //Remove duplicated whitespaces. Not necessary, but should make the final file smaller
         result = result.trim();
@@ -42,17 +46,37 @@ public class PreProcessor {
         return result;
     }
 
-/*    public static void main(String[] args) {
+    public static void main(String[] args) {
         try {
             InputStream in = new FileInputStream("/home/erick/IdeaProjects/entrada");
+            File outputDir = new File("/home/erick/IdeaProjects/saida");
+
+            if(!outputDir.exists())
+                outputDir.mkdirs();
 
             BufferedReader reader = new BufferedReader(new InputStreamReader(in));
             String line;
-
+            String tweet = null;
+            int tweetsCount = 0;
             while ((line = reader.readLine()) != null) {
-                System.out.println(filter(line, true));
+
+                if(line.contains(">>>>>>>>>>>TWEET<<<<<<<<<<<")) {
+                    if (tweet != null) {
+                        FileWriter writer = new FileWriter(new File(outputDir, "tweet" + tweetsCount + ".txt"));
+                        String filtered = filter(tweet, true, true);
+                        if(filtered != null) {
+                            writer.write(filtered);
+                            tweetsCount++;
+                            writer.close();
+                        }
+                        tweet = "";
+
+                    }
+                }else
+                    tweet += line;
             }
-        } catch (IOException ignored) {
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-    }*/
+    }
 }

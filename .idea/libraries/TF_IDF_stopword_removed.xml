@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="TF-IDF_stopword_removed">
-    <CLASSES>
-      <root url="jar://$PROJECT_DIR$/lib/TF-IDF_stopword_removed.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>

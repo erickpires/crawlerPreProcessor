@@ -1,19 +1,29 @@
-import java.io.FileNotFoundException;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.Map;
 
 public class TF_IDF {
 
-    public static void main(String[] args) throws FileNotFoundException {
+    public static void main(String[] args) throws IOException {
+
+        BufferedReader reader = new BufferedReader(new FileReader("meta"));
+        String tmpLine;
+        HashMap<String, String> metas = new HashMap<String, String>();
+        while ((tmpLine = reader.readLine()) != null){
+            String[] tmp = tmpLine.split(":");
+            metas.put(tmp[0].trim(), tmp[1].trim());
+        }
+        reader.close();
 
         PrintStream printStream = new PrintStream("output.arff");
-        printStream.println();
-
+        PrintStream metaStream = new PrintStream("meta.data");
 
         printStream.println("@RELATION tweets\n");
 
-        TfIdf tf = new TfIdf("teste");
+        TfIdf tf = new TfIdf("input");
 
         HashMap<String, Integer> words = new HashMap<String, Integer>();
         int wordsCount = 0;
@@ -29,9 +39,14 @@ public class TF_IDF {
 
 
         printStream.println("@DATA");
+
+        int dataIndex = 0;
         for(String fileName : tf.documents.keySet()){
            // printStream.println("% " + fileName);
+            dataIndex++;
             double[] vector = new double[wordsCount];
+            String tweetLine = metas.get(fileName);
+
             Map<String, Double[]> tf_idfMap = tf.documents.get(fileName).getF_TF_TFIDF();
             for(String word : tf_idfMap.keySet()){
                 int index = words.get(word);
@@ -43,8 +58,13 @@ public class TF_IDF {
             for(Double d : vector)
                 printStream.print(d + ",");
 
-            String attribute = fileName.split("->")[1];
+            String attribute = fileName.split("__")[1];
             printStream.println(attribute);
+
+            metaStream.println(dataIndex + " : " + tweetLine + " : " + attribute + " //" + fileName);
         }
+
+        printStream.close();
+        metaStream.close();
     }
 }
